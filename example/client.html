@@ -1,0 +1,26 @@
+<!doctype html>
+<html>
+  <head>
+
+    <title>Client</title>
+
+    <meta charset="utf-8">
+
+    <script src="../lib/client.js"></script>
+
+  </head>
+
+  <body>
+
+    <!-- Should run on coorslight.com and coorsheavy.com -->
+
+    <script>
+
+      var client = new CorsLight.Client('http://coors.com:8000/example/server.html');
+
+      client.set('infos', { better: String(document.location) }, console.log.bind(console));
+
+    </script>
+  </body>
+
+</html>

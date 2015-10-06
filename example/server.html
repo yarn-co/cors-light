@@ -1,0 +1,26 @@
+<!doctype html>
+<html>
+  <head>
+
+    <title>Server</title>
+
+    <meta charset="utf-8">
+
+    <script src="../lib/server.js"></script>
+
+  </head>
+
+  <body>
+
+    <!-- Should run on coors.com:8000 -->
+
+    <script>
+
+      var server = new CorsLight.Server('demo', {
+        infos: ['coorslight.com', 'coorsheavy.com']
+      });
+
+    </script>
+  </body>
+
+</html>

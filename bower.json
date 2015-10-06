@@ -1,0 +1,20 @@
+{
+  "name": "cors-light",
+  "version": "0.0.0",
+  "authors": [
+    "devinivy <devin@bigroomstudios.com>"
+  ],
+  "description": "Secure, shared local storage across domains",
+  "keywords": [
+    "local",
+    "storage",
+    "cross-domain"
+  ],
+  "license": "Apache 2",
+  "homepage": "https://github.com/yarn-co/cors-light",
+  "ignore": [
+    "**/.*",
+    "bower_components",
+    "test"
+  ]
+}
