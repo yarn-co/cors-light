@@ -1,0 +1,27 @@
+{
+  "name": "cors-light",
+  "version": "0.0.0",
+  "description": "Secure, shared local storage across domains",
+  "main": "lib/index.js",
+  "directories": {
+    "example": "example"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yarn-co/cors-light.git"
+  },
+  "keywords": [
+    "local",
+    "storage",
+    "cross-domain"
+  ],
+  "author": "Devin Ivy <devin@bigroomstudios.com>",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/yarn-co/cors-light/issues"
+  },
+  "homepage": "https://github.com/yarn-co/cors-light#readme"
+}
