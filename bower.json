@@ -10,8 +10,8 @@
     "storage",
     "cross-domain"
   ],
-  "license": "Apache 2",
-  "homepage": "https://github.com/yarn-co/cors-light",
+  "license": "Apache-2.0",
+  "homepage": "https://github.com/yarn-co/cors-light#readme",
   "ignore": [
     "**/.*",
     "bower_components",
