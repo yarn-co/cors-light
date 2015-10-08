@@ -23,10 +23,10 @@
       var base = 'http://banquet.notadomain.com' + port + '/components/cors-light/test';
       var uri = base + '/server.html';
 
-      var error = null;
+      var globalError = null;
       var client = new CorsLight.Client(uri, function(err) {
 
-        error = err;
+        globalError = err;
       });
 
     </script>
@@ -35,6 +35,10 @@
       describe('cors-light', function() {
 
         describe('server', function() {
+
+          beforeEach(function() {
+            globalError = null;
+          });
 
           it('manifest respects origins specified as an array.', function(done) {
 
@@ -54,12 +58,91 @@
             });
           });
 
+          it('responds to invalid key origins.', function(done) {
+
+            client.get('noAccess', function(err, result) {
+
+              expect(result).to.not.exist;
+              expect(err).to.be.instanceof(Error);
+              expect(err.message).to.equal('Invalid origin');
+              done();
+            });
+          });
+
+          it('responds to invalid keys.', function(done) {
+
+            client.get('doesntExist', function(err, result) {
+
+              expect(result).to.not.exist;
+              expect(err).to.be.instanceof(Error);
+              expect(err.message).to.equal('Invalid key');
+              done();
+            });
+          });
+
+          it('responds to unspecified keys.', function(done) {
+
+            client.get('', function(err, result) {
+
+              expect(result).to.not.exist;
+              expect(err).to.be.instanceof(Error);
+              expect(err.message).to.equal('Key not specified');
+              done();
+            });
+          });
+
+          it('responds to invalid TTLs.', function(done) {
+
+            client.set('access', 'bad ttl', 'invalid', function(err) {
+
+              expect(err).to.be.instanceof(Error);
+              expect(err.message).to.equal('Invalid TTL');
+
+              client.get('access', function(err, result) {
+
+                expect(err).to.not.exist;
+                expect(result.value).to.not.equal('bad ttl');
+                done();
+              });
+
+            });
+
+          });
+
+          it('responds to bad requests.', function(done) {
+
+            expect(globalError).to.equal(null);
+
+            client._makeRequest({ bad: 'request' });
+
+            setTimeout(function() {
+
+              expect(globalError).to.be.instanceof(Error);
+              expect(globalError.message).to.equal('Bad request');
+              done();
+            }, 0);
+          });
+
+          it('responds to bad commands.', function(done) {
+
+            expect(globalError).to.equal(null);
+
+            client._queueRequest({ cmd: 'cl::notacommand' });
+
+            setTimeout(function() {
+
+              expect(globalError).to.be.instanceof(Error);
+              expect(globalError.message).to.equal('Bad command: cl::notacommand');
+              done();
+            }, 0);
+          });
+
         });
 
         describe('client', function() {
 
           beforeEach(function() {
-            error = null;
+            globalError = null;
           });
 
           it('can get() using promises and callbacks.', function(done) {
@@ -254,6 +337,58 @@
 
             }).catch(done);
 
+          });
+
+          it('returns errors when disabled.', function(done) {
+
+            client.disabled = true;
+
+            client.get('access')
+            .then(function() {
+              done(new Error()); // Shouldn't run
+            })
+            .catch(function(err) {
+
+              expect(err).to.be.instanceof(Error);
+              expect(err.message).to.match(/disabled/);
+              done();
+            });
+
+            client.disabled = false;
+
+          });
+
+          it('handles unsolicited responses.', function(done) {
+
+            expect(globalError).to.equal(null);
+
+            client._inject({ cmd: 'cl::get', id: -1 });
+
+            expect(globalError).to.be.instanceof(Error);
+            expect(globalError.message).to.equal('Unsolicited response');
+            done();
+          });
+
+          it('handles malformed responses.', function(done) {
+
+            expect(globalError).to.equal(null);
+
+            client._inject('');
+
+            expect(globalError).to.be.instanceof(Error);
+            expect(globalError.message).to.equal('Malformed response');
+            done();
+          });
+
+          it('handles responses from bad origins.', function(done) {
+
+            expect(globalError).to.equal(null);
+
+            client._handleResponse({ origin: 'http://unfamiliardomain.com', data: '{}' });
+
+            expect(globalError).to.be.instanceof(Error);
+            expect(globalError.message).to.equal('Response from bad origin: unfamiliardomain.com');
+            done();
           });
 
         });
