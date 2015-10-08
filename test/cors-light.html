@@ -152,19 +152,20 @@
 
           });
 
-          it('responds to bad commands.', function(done) {
+          it('responds to bad actions.', function(done) {
 
             expect(globalError).to.equal(null);
 
-            client._queueRequest({ cmd: 'cl::notacommand' });
+            client._queueRequest({ act: 'cl::notanaction' });
 
             poll(
               function() {
                 return !!globalError;
               },
               function() {
+                console.log(Error)
                 expect(globalError).to.be.instanceof(Error);
-                expect(globalError.message).to.equal('Bad command: cl::notacommand');
+                expect(globalError.message).to.equal('Bad action: cl::notanaction');
                 done();
               },
               function(err) {
@@ -399,7 +400,7 @@
 
             expect(globalError).to.equal(null);
 
-            client._inject({ cmd: 'cl::get', id: -1 });
+            client._inject({ act: 'cl::get', id: -1 });
 
             expect(globalError).to.be.instanceof(Error);
             expect(globalError.message).to.equal('Unsolicited response');
