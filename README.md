@@ -1,5 +1,8 @@
 # cors-light
+
 Secure, shared local storage across domains.
+
+[![Build Status](https://travis-ci.org/yarn-co/cors-light.svg?branch=master)](https://travis-ci.org/yarn-co/cors-light)
 
 ## API
 

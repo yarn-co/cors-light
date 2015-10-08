@@ -131,6 +131,7 @@
 
           it('can unset() using promises and callbacks.', function(done) {
 
+            // Success path
             client.get('access').then(function(result) {
 
               expect(result.value).to.equal('set was here again');
@@ -144,7 +145,7 @@
 
                   expect(result).to.equal(null);
 
-                  return client.set('access', 'variable is reset')
+                  return client.set('access', 'key is reset')
                 })
                 .then(function() {
 
@@ -159,7 +160,20 @@
                 .then(function(result) {
 
                   expect(result).to.equal(null);
-                  done();
+
+                  // Error path
+                  client.unset('noAccess', function(err, unsetResult) {
+
+                    expect(err).to.exist;
+                    expect(unsetResult).to.be.undefined;
+
+                    client.unset('noAccess').catch(function(err) {
+
+                      expect(err).to.exist;
+                      done();
+                    });
+
+                  });
                 })
                 .catch(done); // Would be a failure
 
