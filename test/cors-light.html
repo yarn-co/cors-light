@@ -24,7 +24,7 @@
         it('passes a basic test', function(done) {
 
           expect(client).to.be.an.instanceof(CorsLight.Client);
-          client1.get('accessArray').then(done).catch(done);
+          client.get('accessArray').then(done).catch(done);
         });
 
       });
