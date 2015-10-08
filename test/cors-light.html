@@ -14,8 +14,13 @@
   <body>
 
     <script>
+
       // Requires spoofing banquet.notadomain.com as localhost
-      var client = new CorsLight.Client('http://banquet.notadomain.com:8000/components/cors-light/test/server.html');
+
+      var port = document.location.port;
+      port = port ? ':' + port : '';
+
+      var client = new CorsLight.Client('http://banquet.notadomain.com' + port + '/components/cors-light/test/server.html');
     </script>
 
     <script>
