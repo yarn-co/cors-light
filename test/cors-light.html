@@ -1,0 +1,33 @@
+<html>
+  <head>
+
+    <title>cors-light tests</title>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1, user-scalable=yes">
+
+    <script src="../../web-component-tester/browser.js"></script>
+    <script src="../lib/client.js"></script>
+
+  </head>
+  <body>
+
+    <script>
+      var client1 = new CorsLight.Client('http://banquet.notadomain.com:8000/components/cors-light/test/server1.html');
+    </script>
+
+    <script>
+      describe('cors-light', function() {
+
+        it('passes a basic test', function(done) {
+
+          expect(client1).to.be.an.instanceof(CorsLight.Client);
+          client1.get('infos').then(done).catch(done);
+        });
+
+      });
+    </script>
+
+  </body>
+</html>
