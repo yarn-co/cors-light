@@ -14,7 +14,8 @@
   <body>
 
     <script>
-      var client1 = new CorsLight.Client('http://banquet.notadomain.com:8000/components/cors-light/test/server1.html');
+      // Requires spoofing banquet.notadomain.com as localhost
+      var client = new CorsLight.Client('http://banquet.notadomain.com:8000/components/cors-light/test/server.html');
     </script>
 
     <script>
@@ -22,8 +23,8 @@
 
         it('passes a basic test', function(done) {
 
-          expect(client1).to.be.an.instanceof(CorsLight.Client);
-          client1.get('infos').then(done).catch(done);
+          expect(client).to.be.an.instanceof(CorsLight.Client);
+          client1.get('accessArray').then(done).catch(done);
         });
 
       });
