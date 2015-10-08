@@ -18,8 +18,16 @@
 
       var client = new CorsLight.Client('http://coors.com:8000/example/server.html');
 
-      client.set('infos', { better: String(document.location) }, console.log.bind(console));
-      client.get('infos', console.log.bind(console));
+      client.set('infos', { better: String(document.location) })
+      .then(function() {
+        return client.get('infos');
+      })
+      .then(function(result) {
+        console.log('Success!', result.value);
+      })
+      .catch(function(err) {
+        console.error(err);
+      });
 
     </script>
   </body>
