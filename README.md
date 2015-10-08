@@ -24,7 +24,7 @@ The client sends requests to a cors-light server to get, set, and unset key-valu
     <script>
 
       var client = new CorsLight.Client('http://centraldomain.com/server.html');
-      
+
       client.get('infos').then(function(result) {
         // result.value contains the value for "infos"
       })
@@ -66,9 +66,10 @@ The server is responsible for centralized local storage and fielding requests fr
 
 ## API
 
-### `new CorsLight.Client(uri)`
+### `new CorsLight.Client(uri, [errorHandler])`
 Creates a new cors-light client where,
  - `uri` - a URI pointing to a page running a cors-light server.
+ - `errorHandler(err)` - an optional callback where errors that are not tied to particular requests will be funneled.
 
 #### `client.get(key, [callback])`
 Obtains a cross-domain store where,
