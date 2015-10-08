@@ -1,0 +1,31 @@
+<!doctype html>
+<html>
+  <head>
+
+    <title>Test server</title>
+
+    <meta charset="utf-8">
+
+    <script src="../lib/server.js"></script>
+
+  </head>
+
+  <body>
+
+    <script>
+
+      localStorage.clear();
+      localStorage.setItem('test::access', JSON.stringify({ value: true, expire: false }));
+
+      new CorsLight.Server('test', {
+        access: ['localhost'],
+        accessArray: ['otherdomain.com', 'localhost'],
+        accessString: 'localhost',
+        noAccess: ['light.com', 'heavy.com']
+      });
+
+    </script>
+
+  </body>
+
+</html>

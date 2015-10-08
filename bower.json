@@ -16,5 +16,8 @@
     "**/.*",
     "bower_components",
     "test"
-  ]
+  ],
+  "devDependencies": {
+    "web-component-tester": "3.x.x"
+  }
 }

@@ -1,0 +1,192 @@
+<html>
+  <head>
+
+    <title>cors-light tests</title>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1, user-scalable=yes">
+
+    <script src="../../web-component-tester/browser.js"></script>
+    <script src="../lib/client.js"></script>
+
+  </head>
+  <body>
+
+    <script>
+
+      // Requires spoofing banquet.notadomain.com as localhost
+
+      var port = document.location.port;
+      port = port ? ':' + port : '';
+
+      var uri = 'http://banquet.notadomain.com' + port + '/components/cors-light/test/server.html';
+
+      var error = null;
+      var client = new CorsLight.Client(uri, function(err) {
+
+        error = err;
+      });
+
+    </script>
+
+    <script>
+      describe('cors-light', function() {
+
+        describe('server', function() {
+
+          it('gives client access when origin specified in an array in the server manifest.', function(done) {
+
+            client.get('accessArray', function(err, result) {
+
+              expect(err).to.not.exist;
+              done();
+            });
+          });
+
+          it('gives client access when origin specified as a string in the server manifest.', function(done) {
+
+            client.get('accessString', function(err, result) {
+
+              expect(err).to.not.exist;
+              done();
+            });
+          });
+
+          it('does not give client access when origin not specified in server manifest.', function(done) {
+
+            client.get('noAccess', function(err, result) {
+
+              expect(err).to.exist;
+              done();
+            });
+          });
+
+        });
+
+        describe('client', function() {
+
+          beforeEach(function() {
+            error = null;
+          });
+
+          it('can get() using promises and callbacks.', function(done) {
+
+            client.get('access', function(err, result) {
+
+              expect(err).to.not.exist;
+              expect(result).to.deep.equal({ value: true, expire: false });
+
+              client.get('noAccess', function(err, result) {
+
+                expect(err).to.exist;
+                expect(result).to.be.undefined;
+
+                client.get('access').then(function(result) {
+
+                  expect(result).to.deep.equal({ value: true, expire: false });
+
+                  client.get('noAccess').catch(function(err) {
+
+                    expect(err).to.exist;
+                    done();
+                  });
+
+                });
+
+              });
+
+            });
+
+          });
+
+          it('can set() using promises and callbacks.', function(done) {
+
+            client.set('access', 'set was here', function(err, setResult) {
+
+              expect(err).to.not.exist;
+              expect(setResult).to.be.undefined;
+
+              client.get('access').then(function(result) {
+
+                expect(result.value).to.equal('set was here');
+
+                return client.set('access', 'set was here again')
+              })
+              .then(function(setResult) {
+
+                expect(setResult).to.be.undefined;
+
+                return client.get('access');
+              })
+              .then(function(result) {
+
+                expect(result.value).to.equal('set was here again');
+                done();
+              });
+
+            });
+
+          });
+
+          it('can unset() using promises and callbacks.', function(done) {
+
+            // Success path
+            client.get('access').then(function(result) {
+
+              expect(result.value).to.equal('set was here again');
+
+              client.unset('access', function(err, unsetResult) {
+
+                expect(err).to.not.exist;
+                expect(unsetResult).to.be.undefined;
+
+                client.get('access').then(function(result) {
+
+                  expect(result).to.equal(null);
+
+                  return client.set('access', 'key is reset')
+                })
+                .then(function() {
+
+                  return client.unset('access');
+                })
+                .then(function(unsetResult) {
+
+                  expect(unsetResult).to.be.undefined;
+
+                  return client.get('access');
+                })
+                .then(function(result) {
+
+                  expect(result).to.equal(null);
+
+                  // Error path
+                  client.unset('noAccess', function(err, unsetResult) {
+
+                    expect(err).to.exist;
+                    expect(unsetResult).to.be.undefined;
+
+                    client.unset('noAccess').catch(function(err) {
+
+                      expect(err).to.exist;
+                      done();
+                    });
+
+                  });
+                })
+                .catch(done); // Would be a failure
+
+              });
+
+            });
+
+          });
+
+        });
+
+      });
+    </script>
+
+  </body>
+</html>
