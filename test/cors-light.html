@@ -29,6 +29,27 @@
         globalError = err;
       });
 
+      var poll = function(fn, callback, errback, timeout, interval) {
+
+        var endTime = Number(new Date()) + (timeout || 50);
+        interval = interval || 5;
+
+        (function p() {
+          // If the condition is met, we're done!
+          if(fn()) {
+            callback();
+          }
+          // If the condition isn't met but the timeout hasn't elapsed, go again
+          else if (Number(new Date()) < endTime) {
+            setTimeout(p, interval);
+          }
+          // Didn't match and too much time, reject!
+          else {
+            errback(new Error('timed out for ' + fn + ': ' + arguments));
+          }
+        })();
+      };
+
     </script>
 
     <script>
@@ -115,12 +136,20 @@
 
             client._makeRequest({ bad: 'request' });
 
-            setTimeout(function() {
+            poll(
+              function() {
+                return !!globalError;
+              },
+              function() {
+                expect(globalError).to.be.instanceof(Error);
+                expect(globalError.message).to.equal('Bad request');
+                done();
+              },
+              function(err) {
+                done(err);
+              }
+            );
 
-              expect(globalError).to.be.instanceof(Error);
-              expect(globalError.message).to.equal('Bad request');
-              done();
-            }, 0);
           });
 
           it('responds to bad commands.', function(done) {
@@ -129,12 +158,20 @@
 
             client._queueRequest({ cmd: 'cl::notacommand' });
 
-            setTimeout(function() {
+            poll(
+              function() {
+                return !!globalError;
+              },
+              function() {
+                expect(globalError).to.be.instanceof(Error);
+                expect(globalError.message).to.equal('Bad command: cl::notacommand');
+                done();
+              },
+              function(err) {
+                done(err);
+              }
+            );
 
-              expect(globalError).to.be.instanceof(Error);
-              expect(globalError.message).to.equal('Bad command: cl::notacommand');
-              done();
-            }, 0);
           });
 
         });
@@ -278,7 +315,7 @@
 
           it('set() method can specify a numeric ttl.', function(done) {
 
-            client.set('access', 'transient', 10)
+            client.set('access', 'transient', 20)
             .then(function() {
 
               return client.get('access')
@@ -287,7 +324,7 @@
 
               expect(result.value).to.equal('transient');
               expect(result.expire).to.be.a('number');
-              expect(result.expire - Date.now()).to.be.within(0, 10);
+              expect(result.expire - Date.now()).to.be.within(0, 20);
               expect(result.session).to.not.exist;
 
               setTimeout(function() {
@@ -299,7 +336,7 @@
 
                 }).catch(done);
 
-              }, 10);
+              }, 20);
 
             }).catch(done);
 
