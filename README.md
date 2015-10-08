@@ -100,3 +100,6 @@ Creates a new cors-light server where,
       username: ['trixel.io', 'altered.io']
     }
     ```
+
+# Extras
+This project is inspired by (and effectively forked from) the late [XAuth](https://github.com/xauth/xauth), which pioneered the technique used in cors-light to create a client-server model by posting messages between iframes, backed by local storage.  The original technique dates back to 2010.
