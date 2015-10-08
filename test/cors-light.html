@@ -20,7 +20,8 @@
       var port = document.location.port;
       port = port ? ':' + port : '';
 
-      var uri = 'http://banquet.notadomain.com' + port + '/components/cors-light/test/server.html';
+      var base = 'http://banquet.notadomain.com' + port + '/components/cors-light/test';
+      var uri = base + '/server.html';
 
       var error = null;
       var client = new CorsLight.Client(uri, function(err) {
@@ -35,7 +36,7 @@
 
         describe('server', function() {
 
-          it('gives client access when origin specified in an array in the server manifest.', function(done) {
+          it('manifest respects origins specified as an array.', function(done) {
 
             client.get('accessArray', function(err, result) {
 
@@ -44,20 +45,11 @@
             });
           });
 
-          it('gives client access when origin specified as a string in the server manifest.', function(done) {
+          it('manifest respects origin specified as a string.', function(done) {
 
             client.get('accessString', function(err, result) {
 
               expect(err).to.not.exist;
-              done();
-            });
-          });
-
-          it('does not give client access when origin not specified in server manifest.', function(done) {
-
-            client.get('noAccess', function(err, result) {
-
-              expect(err).to.exist;
               done();
             });
           });
@@ -80,7 +72,7 @@
               client.get('noAccess', function(err, result) {
 
                 expect(err).to.exist;
-                expect(result).to.be.undefined;
+                expect(result).to.not.exist;
 
                 client.get('access').then(function(result) {
 
@@ -105,7 +97,7 @@
             client.set('access', 'set was here', function(err, setResult) {
 
               expect(err).to.not.exist;
-              expect(setResult).to.be.undefined;
+              expect(setResult).to.not.exist;
 
               client.get('access').then(function(result) {
 
@@ -115,7 +107,7 @@
               })
               .then(function(setResult) {
 
-                expect(setResult).to.be.undefined;
+                expect(setResult).to.be.not.exist;
 
                 return client.get('access');
               })
@@ -131,7 +123,7 @@
 
           it('can unset() using promises and callbacks.', function(done) {
 
-            // Success path
+            // Success path, lots of checking to do
             client.get('access').then(function(result) {
 
               expect(result.value).to.equal('set was here again');
@@ -139,7 +131,7 @@
               client.unset('access', function(err, unsetResult) {
 
                 expect(err).to.not.exist;
-                expect(unsetResult).to.be.undefined;
+                expect(unsetResult).to.not.exist;
 
                 client.get('access').then(function(result) {
 
@@ -153,7 +145,7 @@
                 })
                 .then(function(unsetResult) {
 
-                  expect(unsetResult).to.be.undefined;
+                  expect(unsetResult).to.not.exist;
 
                   return client.get('access');
                 })
@@ -165,7 +157,7 @@
                   client.unset('noAccess', function(err, unsetResult) {
 
                     expect(err).to.exist;
-                    expect(unsetResult).to.be.undefined;
+                    expect(unsetResult).to.be.not.exist;
 
                     client.unset('noAccess').catch(function(err) {
 
@@ -180,6 +172,87 @@
               });
 
             });
+
+          });
+
+          it('set() method can specify no ttl.', function(done) {
+
+            client.set('access', 'forever')
+            .then(function() {
+
+              return client.get('access')
+            })
+            .then(function(result) {
+
+              expect(result.value).to.equal('forever');
+              expect(result.expire).to.equal(false);
+              expect(result.session).to.not.exist;
+
+              done();
+            }).catch(done);
+
+          });
+
+          it('set() method can specify a numeric ttl.', function(done) {
+
+            client.set('access', 'transient', 10)
+            .then(function() {
+
+              return client.get('access')
+            })
+            .then(function(result) {
+
+              expect(result.value).to.equal('transient');
+              expect(result.expire).to.be.a('number');
+              expect(result.expire - Date.now()).to.be.within(0, 10);
+              expect(result.session).to.not.exist;
+
+              setTimeout(function() {
+
+                client.get('access').then(function(result) {
+
+                  expect(result).to.equal(null);
+                  done();
+
+                }).catch(done);
+
+              }, 10);
+
+            }).catch(done);
+
+          });
+
+          it('set() method can specify a sessioned ttl.', function(done) {
+
+            client.set('access', 'transient', 'session')
+            .then(function() {
+
+              return client.get('access')
+            })
+            .then(function(result) {
+
+              expect(result.value).to.equal('transient');
+              expect(result.expire).to.not.exist;
+              expect(result.session).to.exist;
+
+              // Clear session on server's domain
+              var clearSession = document.createElement('iframe');
+              clearSession.src = base + '/clear-session.html';
+              document.body.appendChild(clearSession);
+              clearSession.onload = function() {
+
+                document.body.removeChild(clearSession);
+
+                client.get('access')
+                .then(function(result) {
+
+                  expect(result).to.equal(null);
+                  done();
+                }).catch(done);
+
+              };
+
+            }).catch(done);
 
           });
 
