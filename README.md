@@ -83,7 +83,7 @@ Obtains a cross-domain store where,
 Sets a cross-domain store where,
  - `key` - the key of the store being set.
  - `value` - the value to assign to the store.
- - `ttl` - an optional time-to-live for the store, specified in milliseconds.  If set to `'session'`, the store will instead expire with the user's browser session.  If `false` or not specified, the store will be scheduled to expire.
+ - `ttl` - an optional time-to-live for the store, specified in milliseconds.  If set to `'session'`, the store will instead expire with the user's browser session.  If `false` or not specified, the store will not be scheduled to expire.
  - `callback(err)` - an optional callback to indicate success or failure of setting the store.  When not present, `client.set()` will instead return a promise.
 
 #### `client.unset(key, [callback])`
